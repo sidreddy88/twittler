@@ -7,21 +7,75 @@
   <body>
     <script>
 
-      $(document).ready(function(){
-        var $body = $('body');
-        $body.html('');
-
-        var index = streams.home.length - 1;
-        while(index >= 0){
-          var tweet = streams.home[index];
-          var $tweet = $('<div></div>');
-          $tweet.text('@' + tweet.user + ': ' + tweet.message);
-          $tweet.appendTo($body);
-          index -= 1;
-        }
-
-      });
-
+    	$(document).ready(function(){
+    		var $body = $('body');
+    		$body.html('');
+    
+    		var $tweetButton = $('<input type="button" id="button" value = "New tweets" /><div id="tweetContainer"></div>');
+    		$tweetButton.appendTo($body);
+    
+    		initListeners();
+    		initTweets();
+    		
+    		function appendTweet(index){
+    			var tweet = streams.home[index];
+    			var $tweet = $('<div></div>');
+    			var $userLink =  $('<a href="#" class="userLink test"></a>');
+    			$userLink.on('click',userLink);
+    			$userLink.attr('data-user-id',tweet.user);
+    			$userLink.html('@' + tweet.user+' :');
+    			$tweet.append($userLink);
+    			$tweet.append(tweet.message + " - " + tweet.created_at);
+    			//	            $tweet.html('<a href="#" class="userLink" data-user-id="' + tweet.user +'">@' + tweet.user + '</a>: ' + 
+    			//  	        tweet.message + " - " + tweet.created_at);
+    			$tweet.prependTo($('#tweetContainer'));			
+    		}
+    		
+    		function initListeners() {
+    			$('#button').on('click', function () {
+    				generateRandomTweet();
+    				 var index = streams.home.length - 1;
+    				//Show tweet from streams.home
+    				appendTweet(index);
+    			});
+    		}
+    
+    		//$('.userLink').on('click',userLink);
+    
+    		function userLink() {
+    			$('.user-tweet').remove();
+    
+    			//When a user link is clicked we want to get their timeline
+    			var userId = $(this).data('userId');//data-user-id attribute
+    
+    			//Get user tweets by user id
+    			var userTweets = streams.users[userId];
+    
+    			for (var i = 0 ; i < userTweets.length; i++) {
+    				var $tweetObject= $('<div class="user-tweet"></div>');
+    				var tweetObject = userTweets[i];
+    				console.log(tweetObject);
+    				var string;
+    				if (i === 0){
+    				string = "<br>" +  "Timeline of " + tweetObject.user + "<br>" ;  
+    				} else {
+    				string = "<br>";
+    				}
+    				$tweetObject .html(string  + "Tweet" + " "  + i +  "<br>" +  " Message - " +tweetObject.message  + "<br>" + "TimeCreated - " +
+    				tweetObject.created_at );
+    				$tweetObject.appendTo($('#tweetContainer'));
+    			}    
+    		}        
+    
+    		function initTweets() {
+    			var index = streams.home.length - 1;
+    			while(index >= 0){
+    				appendTweet(index);
+    				index -= 1;
+    			}
+    		}
+    
+    	});
     </script>
   </body>
 </html>
